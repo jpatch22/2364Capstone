@@ -1,0 +1,25 @@
+
+---------------------------------------------------
+[0000:01:00.1] : xilinx_vck5000_gen4x8_qdma_base_2
+---------------------------------------------------
+Thermals
+  Temperature            : Celcius
+  PCB                    :     21 C
+  device                 :     39 C
+  vccint                 :     36 C
+  cage_temp_0            :      0 C
+  cage_temp_1            :      0 C
+
+Electrical
+  Max Power              : NA Watts
+  Power                  : 42 Watts
+  Power Warning          : NA
+
+  Power Rails            : Voltage   Current
+  12v_pex                : 11.999 V,  1.072 A
+  3v3_pex                :  3.270 V
+  3v3_aux                :  3.310 V
+  12v_aux_0              : 12.077 V,  1.569 A
+  12v_aux_1              : 12.127 V,  0.840 A
+  vccint                 :  0.800 V, 31.100 A
+
