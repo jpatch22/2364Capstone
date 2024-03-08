@@ -6,6 +6,7 @@ import pandas as pd
 DEFAULT_BASH_COMMAND = "/opt/xilinx/xrt/bin/xbutil examine --device --report thermal electrical"
 DEFAULT_INTERVAL = 1 #s
 DEFAULT_ITERATIONS = 20
+DEBUGGING_INTERVAL = 10
 UNIT_MAPPING = {
     'Temp-PCB': ['C'],
     'Temp-device': ['C'],
@@ -35,6 +36,8 @@ class Data_Collector:
     def run_collection(self):
         # runs the command to collect data and records the output
         for i in range(self.number_of_iterations):
+            if i % DEBUGGING_INTERVAL == 0:
+                print(f"Running collection {i} s passed")
             output = subprocess.check_output(self.bash_command, shell=True, text=True)
             #output = re.escape(output)
             self.parse_data(i, output)
@@ -136,6 +139,10 @@ Electrical
 
 def main():
     dc = Data_Collector('test.csv')
+    dc.run_collection()
+    dc.save_to_csv()
+    return
+    # Testing moment
     dc.parse_data(0, format_str)
     dc.parse_data(1, format_str)
     dc.save_to_csv()
