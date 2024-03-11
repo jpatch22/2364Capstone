@@ -2,8 +2,14 @@ import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
 from app import Annotation
+from tkinter import ttk
+from app.models.test_model import Test_Model
 
 class ImageViewer:
+    MODELS_AVAILABLE = {"None Selected" : None,
+                        "Testing" : Test_Model()
+                        }
+
     def __init__(self, root, width, height):
         self.root = root
         self.root.title("Image Viewer")
@@ -24,6 +30,12 @@ class ImageViewer:
         self.root.bind('<Motion>', self.update_cursor_position)
         self.annotations = []
 
+        labels = list(self.MODELS_AVAILABLE.keys())
+
+        self.label_combobox = ttk.Combobox(self.root, values=labels)
+        self.label_combobox.pack(side=tk.RIGHT, padx=10)
+        self.label_combobox.set(labels[0])
+
     def add_annotations(self, annotations):
         """
         Adds boxes in the format [[x1, y1, x2, y2]]
@@ -43,6 +55,12 @@ class ImageViewer:
             # Display the image on the canvas
             self.image_label.create_image(0, 0, anchor=tk.NW, image=photo)
             self.image_label.image = photo
+
+            selected_model = self.MODELS_AVAILABLE[self.label_combobox.get()]
+            if selected_model:
+                self.annotations = selected_model.supply_annotations(self.image)
+            else:
+                self.annotations = []
 
     def update_cursor_position(self, event):
         self.image_label.delete('box')
