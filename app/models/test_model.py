@@ -27,7 +27,18 @@ class Test_Model(Model):
         return annotations
 
     def generate_funny_name(self):
-        # Implement your logic to generate a funny name here
-        funny_names = ["Supreme Leader", "Captain Chuckle", "Sir Gigglesworth", "Laughing Llama", "Joker McJokeface"]
+        funny_names = [
+                "Labrador Retriever",
+                "German Shepherd",
+                "Golden Retriever",
+                "Bulldog",
+                "Beagle",
+                "Poodle",
+                "Boxer",
+                "Siberian Husky",
+                "Dachshund",
+                "Shih Tzu"
+                ]
+
         return random.choice(funny_names)
 

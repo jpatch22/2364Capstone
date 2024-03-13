@@ -12,29 +12,45 @@ class ImageViewer:
 
     def __init__(self, root, width, height):
         self.root = root
-        self.root.title("Image Viewer")
+        title = "MDA Space Machine Learning Demo"
+        self.root.title(title)
+        large_font = ("Helvetica", 20)
+        label = tk.Label(self.root, text=title, font=large_font)
+        #label.grid(row=0,column=0)
+        label.pack()
 
         self.width = width
         self.height = height
 
-        self.image_label = tk.Canvas(self.root, width=width, height=height, borderwidth=2, relief="solid")
-        self.image_label.pack(padx=10, pady=10)
+        text_label = tk.Label(root, text="Select Model")
+        #text_label.grid(row=1, column=1)
+        text_label.pack()
 
-        self.status_label = tk.Label(self.root, text="Cursor Position: (x, y)")
-        self.status_label.pack(pady=10)
+        labels = list(self.MODELS_AVAILABLE.keys())
+        self.label_combobox = ttk.Combobox(self.root, values=labels)
+        #self.label_combobox.grid(row=1,column=2)
+        self.label_combobox.pack()
+        self.label_combobox.set(labels[0])
 
         self.load_button = tk.Button(self.root, text="Load Image", command=self.load_image)
-        self.load_button.pack(pady=10)
+        #self.load_button.grid(row=1, column=0)
+        self.load_button.pack()
+
+        self.image_label = tk.Canvas(self.root, width=width, height=height, borderwidth=2, relief="solid")
+        #self.image_label.grid(row=3, column = 0)
+        self.image_label.pack()
+        
+        self.ann_label = tk.Label(self.root, text="Annotation:")
+        self.ann_label.pack(side=tk.LEFT)
+
+        self.status_label = tk.Label(self.root, text="Cursor Position: (x, y)")
+        #self.status_label.grid(row=3, column=1)
+        self.status_label.pack(side=tk.RIGHT)
 
         self.image = None
         self.root.bind('<Motion>', self.update_cursor_position)
         self.annotations = []
 
-        labels = list(self.MODELS_AVAILABLE.keys())
-
-        self.label_combobox = ttk.Combobox(self.root, values=labels)
-        self.label_combobox.pack(side=tk.RIGHT, padx=10)
-        self.label_combobox.set(labels[0])
 
     def add_annotations(self, annotations):
         """
