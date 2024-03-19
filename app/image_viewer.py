@@ -1,4 +1,5 @@
 import tkinter as tk
+import os
 from tkinter import filedialog
 from PIL import Image, ImageTk
 from app import Annotation
@@ -9,6 +10,7 @@ class ImageViewer:
     MODELS_AVAILABLE = {"None Selected" : None,
                         "Testing" : Test_Model()
                         }
+    IMAGE_FILE_TYPES = [('Jpg Files', '*.jpg'),('PNG Files','*.png')]
 
     def __init__(self, root, width, height):
         self.root = root
@@ -36,6 +38,9 @@ class ImageViewer:
         #self.load_button.grid(row=1, column=0)
         self.load_button.pack()
 
+        self.load_dir_button = tk.Button(self.root, text="Load Image Folder", command=self.load_image_dir)
+        self.load_dir_button.pack()
+
         self.image_label = tk.Canvas(self.root, width=width, height=height, borderwidth=2, relief="solid")
         #self.image_label.grid(row=3, column = 0)
         self.image_label.pack()
@@ -58,8 +63,16 @@ class ImageViewer:
         """
         self.annotations = annotations 
 
+    def load_image_dir(self):
+        selected_path = filedialog.askdirectory()
+        if selected_path:
+            files = self.find_image_files(selected_path)
+            self.images = self.load_images(files)
+            print(self.images)
+
     def load_image(self):
-        file_path = filedialog.askopenfilename()
+        file_path = filedialog.askopenfilename(filetypes=self.IMAGE_FILE_TYPES)
+
         if file_path:
             self.image = Image.open(file_path)
             self.image = self.image.resize((self.width, self.height), Image.LANCZOS)
@@ -140,6 +153,22 @@ class ImageViewer:
             return (x_canvas, y_canvas)
         else:
             return None
+
+    def find_image_files(self, directory):
+        image_extensions = tuple([file_type[1][1:] for file_type in self.IMAGE_FILE_TYPES])
+        image_files = []
+        for root, dirs, files in os.walk(directory):
+            for file in files:
+                if file.lower().endswith(image_extensions):
+                    image_files.append(os.path.join(root, file))
+        return image_files
+
+    def load_images(self, files):
+        images = []
+        for filename in files:
+            img = Image.open(filename)
+            images.append(img)
+        return images
         
 if __name__ == "__main__":
     root = tk.Tk()
