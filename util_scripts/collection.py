@@ -55,6 +55,9 @@ class Data_Collector:
                 key = f"{m[0]} ({unit})"
                 if key not in self.data:
                     self.data[key] = []
+            if len(m) ==2:
+                key = f"{m[0]} ({UNIT_MAPPING[m[0]][0]})"
+                self.data[key].append((iteration, m[1]))
             if len(m) == 3:
                 key = f"{m[0]} ({UNIT_MAPPING[m[0]][0]})"
                 self.data[key].append((iteration, m[1]))
