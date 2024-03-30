@@ -55,7 +55,8 @@ class ImageViewer:
         #self.status_label.grid(row=3, column=1)
         self.status_label.pack(side=tk.RIGHT)
 
-        self.image = None
+        self.image = None # currently showing image
+        self.images = []
         self.root.bind('<Motion>', self.update_cursor_position)
         self.annotations = []
 
@@ -78,6 +79,7 @@ class ImageViewer:
 
         if file_path:
             self.image = Image.open(file_path)
+            self.images = [self.image]
             self.image = self.image.resize((self.width, self.height), Image.LANCZOS)
             photo = ImageTk.PhotoImage(self.image)
 
@@ -90,7 +92,7 @@ class ImageViewer:
 
             selected_model = self.MODELS_AVAILABLE[self.label_combobox.get()]
             if selected_model:
-                self.annotations = selected_model.supply_annotations(self.image)
+                self.annotations = selected_model.supply_annotations([self.image])
             else:
                 self.annotations = []
 
@@ -108,7 +110,7 @@ class ImageViewer:
             canvas_height = self.image_label.winfo_height()
     
             # Check if the cursor is within the canvas bounds
-            if canvas_x <= x < canvas_x + canvas_width and canvas_y <= y < canvas_y + canvas_height:
+            if canvas_x <= x < canvas_x + canvas_width and canvas_y <= y < canvas_y + canvas_height and self.annotations:
                 # Calculate the relative position within the image
                 x_within_image = int((x - canvas_x) / canvas_width * self.image.width)
                 y_within_image = int((y - canvas_y) / canvas_height * self.image.height)
@@ -117,8 +119,14 @@ class ImageViewer:
                 # Debugging moment
                 # label_str = f"Cursor Position: ({x_within_image}, {y_within_image}) within Image"
                 label_str = ""
+                index = 0
+                for i in range(len(self.images)):
+                    if self.images[i] == self.image:
+                        index = i
+                        break
+                print("HERE", index, self.annotations)
 
-                for annotation in self.annotations:
+                for annotation in self.annotations[index]:
                     x1, y1, x2, y2 = annotation.box
                     if x1 <= x <= x2 and y1 <= y <= y2:
                         self.image_label.create_rectangle(x1, y1, x2, y2, outline='red', width=5, tag='box')
