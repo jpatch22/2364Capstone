@@ -6,7 +6,6 @@ from app import Annotation
 from tkinter import ttk
 from app.models.class_custom import Class_Custom
 from app.models.test_model import Test_Model
-from app.models.yolov5 import Yolov5 
 
 class ImageViewer:
     MODELS_AVAILABLE = {"None Selected" : None,
@@ -17,7 +16,6 @@ class ImageViewer:
     IMAGE_FILE_TYPES = [('Jpg Files', '*.jpg'),('PNG Files','*.png')]
 
     def __init__(self, root, width, height):
-        print("yolo", self.MODELS_AVAILABLE["Yolov5"])
         self.root = root
         title = "MDA Space Machine Learning Demo"
         self.root.title(title)
