@@ -6,12 +6,14 @@ from app import Annotation
 from tkinter import ttk
 from app.models.class_custom import Class_Custom
 from app.models.test_model import Test_Model
+from app.models.run_model import Classification_Model_Runner
 
 class ImageViewer:
     MODELS_AVAILABLE = {"None Selected" : None,
                         "Testing" : Test_Model(),
                         #"Yolov5" : Yolov5(),
-                        "Custom Classifier": Class_Custom()
+                        "Custom Classifier": Class_Custom(),
+                        "Custom Classifier DPU": Classification_Model_Runner()
                         }
     IMAGE_FILE_TYPES = [('Jpg Files', '*.jpg'),('PNG Files','*.png')]
 
@@ -75,7 +77,8 @@ class ImageViewer:
             print(self.images)
 
     def load_image(self):
-        file_path = filedialog.askopenfilename(filetypes=self.IMAGE_FILE_TYPES)
+        #file_path = filedialog.askopenfilename(filetypes=self.IMAGE_FILE_TYPES)
+        file_path = filedialog.askopenfilename()
 
         if file_path:
             self.image = Image.open(file_path)
@@ -124,9 +127,14 @@ class ImageViewer:
                     if self.images[i] == self.image:
                         index = i
                         break
-                print("HERE", index, self.annotations)
 
                 for annotation in self.annotations[index]:
+                    if annotation is None or annotation.box is None:
+                        #print("here labelling")
+                        #print(annotation.label)
+                        label_str = annotation.label
+                        continue
+
                     x1, y1, x2, y2 = annotation.box
                     if x1 <= x <= x2 and y1 <= y <= y2:
                         self.image_label.create_rectangle(x1, y1, x2, y2, outline='red', width=5, tag='box')

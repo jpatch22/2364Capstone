@@ -1,0 +1,8 @@
+{
+    "lib": "libvart-dpu-runner.so",
+    "filename": "class_v1.xmodel",
+    "kernel": [
+        "subgraph_ImageClassifier__ImageClassifier_Conv2d_conv1__ret_3"
+    ],
+    "target": "DPUCVDX8H_ISA1_F2W4_4PE"
+}
