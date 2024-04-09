@@ -6,14 +6,14 @@ from app import Annotation
 from tkinter import ttk
 from app.models.class_custom import Class_Custom
 from app.models.test_model import Test_Model
-#from app.models.run_model import Classification_Model_Runner
+from app.models.run_model import Classification_Model_Runner
 
 class ImageViewer:
     MODELS_AVAILABLE = {"None Selected" : None,
                         "Testing" : Test_Model(),
                         #"Yolov5" : Yolov5(),
                         "Custom Classifier": Class_Custom(),
-                        #"Custom Classifier DPU": Classification_Model_Runner()
+                        "Custom Classifier DPU": Classification_Model_Runner()
                         }
     IMAGE_FILE_TYPES = [('Jpg Files', '*.jpg'),('PNG Files','*.png')]
 

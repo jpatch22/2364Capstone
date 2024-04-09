@@ -9,7 +9,8 @@ import yaml
 
 class Classification_Model_Runner:
     def __init__(self):
-        xmodel_file = "app/models/class_v1/class_v1.xmodel"
+        #xmodel_file = "app/models/class_v1/class_v1.xmodel"
+        xmodel_file = "app/models/random.xmodel"
         graph = xir.Graph.deserialize(xmodel_file)
         subgraph = graph.get_root_subgraph().toposort_child_subgraph()
         index = -1
@@ -56,8 +57,8 @@ class Classification_Model_Runner:
         dpu = self.runner
         num_samples = 1
         num_channels = 3
-        image_height = 32
-        image_width = 32
+        image_height = 128
+        image_width = 128
         num_classes = 10
         input_shape = (num_channels, image_height, image_width)
 
