@@ -4,11 +4,16 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 from app import Annotation
 from tkinter import ttk
+from app.models.class_custom import Class_Custom
 from app.models.test_model import Test_Model
+from app.models.run_model import Classification_Model_Runner
 
 class ImageViewer:
     MODELS_AVAILABLE = {"None Selected" : None,
-                        "Testing" : Test_Model()
+                        "Testing" : Test_Model(),
+                        #"Yolov5" : Yolov5(),
+                        "Custom Classifier": Class_Custom(),
+                        "Custom Classifier DPU": Classification_Model_Runner()
                         }
     IMAGE_FILE_TYPES = [('Jpg Files', '*.jpg'),('PNG Files','*.png')]
 
@@ -47,14 +52,20 @@ class ImageViewer:
         
         self.ann_label = tk.Label(self.root, text="Annotation:")
         self.ann_label.pack(side=tk.LEFT)
+        self.prev_button = tk.Button(root, text="Previous Image", command=self.previous_image)
+        self.next_button = tk.Button(root, text="Next Image", command=self.next_image)
+        self.next_button.pack(side=tk.LEFT)
+        self.prev_button.pack(side=tk.RIGHT)
 
         self.status_label = tk.Label(self.root, text="Cursor Position: (x, y)")
         #self.status_label.grid(row=3, column=1)
         self.status_label.pack(side=tk.RIGHT)
 
-        self.image = None
+        self.image = None # currently showing image
+        self.images = []
         self.root.bind('<Motion>', self.update_cursor_position)
         self.annotations = []
+        self.selected_index = 0
 
 
     def add_annotations(self, annotations):
@@ -68,13 +79,47 @@ class ImageViewer:
         if selected_path:
             files = self.find_image_files(selected_path)
             self.images = self.load_images(files)
-            print(self.images)
+            self.selected_index = 0
+            self.image = self.images[self.selected_index]
+            self.image = self.image.resize((self.width, self.height), Image.LANCZOS)
+            photo = ImageTk.PhotoImage(self.image)
+
+            self.image_label.delete("all")
+            self.image_label.create_image(0, 0, anchor=tk.NW, image=photo)
+            self.image_label.image = photo
+            selected_model = self.MODELS_AVAILABLE[self.label_combobox.get()]
+            if selected_model:
+                self.annotations = selected_model.supply_annotations(self.images)
+            else:
+                self.annotations = []
+    
+    def next_image(self):
+        self.selected_index += 1
+        self.reload_image()
+
+    def previous_image(self):
+        self.selected_index -= 1
+
+    def reload_image(self):
+        self.image = self.images[self.selected_index]
+        self.image = self.image.resize((self.width, self.height), Image.LANCZOS)
+        photo = ImageTk.PhotoImage(self.image)
+
+        self.image_label.delete("all")
+        self.image_label.create_image(0, 0, anchor=tk.NW, image=photo)
+        self.image_label.image = photo
+        selected_model = self.MODELS_AVAILABLE[self.label_combobox.get()]
+        if selected_model and not self.annotations:
+            self.annotations = selected_model.supply_annotations([self.image])
+        
 
     def load_image(self):
-        file_path = filedialog.askopenfilename(filetypes=self.IMAGE_FILE_TYPES)
+        #file_path = filedialog.askopenfilename(filetypes=self.IMAGE_FILE_TYPES)
+        file_path = filedialog.askopenfilename()
 
         if file_path:
             self.image = Image.open(file_path)
+            self.images = [self.image]
             self.image = self.image.resize((self.width, self.height), Image.LANCZOS)
             photo = ImageTk.PhotoImage(self.image)
 
@@ -87,7 +132,7 @@ class ImageViewer:
 
             selected_model = self.MODELS_AVAILABLE[self.label_combobox.get()]
             if selected_model:
-                self.annotations = selected_model.supply_annotations(self.image)
+                self.annotations = selected_model.supply_annotations([self.image])
             else:
                 self.annotations = []
 
@@ -105,7 +150,7 @@ class ImageViewer:
             canvas_height = self.image_label.winfo_height()
     
             # Check if the cursor is within the canvas bounds
-            if canvas_x <= x < canvas_x + canvas_width and canvas_y <= y < canvas_y + canvas_height:
+            if canvas_x <= x < canvas_x + canvas_width and canvas_y <= y < canvas_y + canvas_height and self.annotations:
                 # Calculate the relative position within the image
                 x_within_image = int((x - canvas_x) / canvas_width * self.image.width)
                 y_within_image = int((y - canvas_y) / canvas_height * self.image.height)
@@ -114,16 +159,39 @@ class ImageViewer:
                 # Debugging moment
                 # label_str = f"Cursor Position: ({x_within_image}, {y_within_image}) within Image"
                 label_str = ""
+                index = self.selected_index
+                #for i in range(len(self.images)):
+                #    if self.images[i] == self.image:
+                #        index = i
+                #        break
 
-                for annotation in self.annotations:
+                for annotation in self.annotations[index]:
+                    if annotation is None or annotation.box is None:
+                        label_str = annotation.label
+                        continue
+
                     x1, y1, x2, y2 = annotation.box
                     if x1 <= x <= x2 and y1 <= y <= y2:
                         self.image_label.create_rectangle(x1, y1, x2, y2, outline='red', width=5, tag='box')
                         label_str = annotation.label + " " + label_str
                 self.status_label.config(text=label_str)
             else:
+                label_str = ""
+                index = 0
+                index = self.selected_index
+                #for i in range(len(self.images)):
+                #    if self.images[i] == self.image:
+                #        index = i
+                #        break
+
+                for annotation in self.annotations[index]:
+                    if annotation is None or annotation.box is None:
+                        label_str = annotation.label
+                        continue
+
+                self.status_label.config(text=label_str)
                 # Cursor is outside the canvas
-                self.status_label.config(text="Cursor outside canvas")
+                #self.status_label.config(text="Cursor outside canvas")
     
     def canvas_coords_to_image(self, x, y):
         canvas_x = self.image_label.winfo_x()
