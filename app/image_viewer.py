@@ -5,10 +5,12 @@ from PIL import Image, ImageTk
 from app import Annotation
 from tkinter import ttk
 from app.models.test_model import Test_Model
+from app.models.planes_yolov5 import Planes_Model
 
 class ImageViewer:
     MODELS_AVAILABLE = {"None Selected" : None,
-                        "Testing" : Test_Model()
+                        "Testing" : Test_Model(),
+                        "Planes Yolov5" : Planes_Model()
                         }
     IMAGE_FILE_TYPES = [('Jpg Files', '*.jpg'),('PNG Files','*.png')]
 
