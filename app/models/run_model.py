@@ -6,6 +6,7 @@ import xir
 import torch.nn.functional as F
 from app.Annotation import Annotation
 import yaml
+import time
 
 class Classification_Model_Runner:
     def __init__(self):
@@ -55,7 +56,8 @@ class Classification_Model_Runner:
 
     def run_dpu(self, images):
         dpu = self.runner
-        num_samples = 1
+        #num_samples = 1
+        num_samples = len(images)
         num_channels = 3
         image_height = 128
         image_width = 128
@@ -113,8 +115,13 @@ class Classification_Model_Runner:
         mapping_dic = self.load_class_dict_from_yaml("app/models/custom_classification/class_mappings.yaml")
         rev_dic = {v : k for k, v in mapping_dic.items()}
         imdic = {}
+        print("Sending to DPU")
+        start_time = time.time()
         x = self.run_dpu(image_list)
-        print(rev_dic.keys())
+        end_time = time.time()
+        print(f"Time to process {len(image_list)} : {end_time - start_time}")
+
+        #print(rev_dic.keys())
 
         for i in range(len(image_list)):
             annotations = []
@@ -123,7 +130,7 @@ class Classification_Model_Runner:
             annotations.append(annotation)
 
             imdic[i] = annotations
-        print(imdic)
+        #print(imdic)
 
         return imdic
 
