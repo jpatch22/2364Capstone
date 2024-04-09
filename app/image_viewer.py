@@ -100,7 +100,8 @@ class ImageViewer:
     
             # Get the position of the Canvas within its parent
             canvas_x = self.image_label.winfo_x()
-            canvas_y = self.image_label.winfo_y()
+            # canvas_y = self.image_label.winfo_y()
+            canvas_y = 0
     
             # Get the size of the canvas
             canvas_width = self.image_label.winfo_width()
