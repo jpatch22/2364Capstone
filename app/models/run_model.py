@@ -7,11 +7,13 @@ import torch.nn.functional as F
 from app.Annotation import Annotation
 import yaml
 import time
+from collections import Counter
 
 class Classification_Model_Runner:
     def __init__(self):
         #xmodel_file = "app/models/class_v1/class_v1.xmodel"
-        xmodel_file = "app/models/random.xmodel"
+        #xmodel_file = "app/models/random.xmodel"
+        xmodel_file = "app/models/final.xmodel"
         graph = xir.Graph.deserialize(xmodel_file)
         subgraph = graph.get_root_subgraph().toposort_child_subgraph()
         index = -1
@@ -78,6 +80,7 @@ class Classification_Model_Runner:
         sample_input = torch.randn(num_samples, *input_shape)
         count = 0
         outputData = []
+        print(f"The batchsize is {batch_size}")
         while count < num_samples:
             if (count + batch_size <= num_samples):
                 runSize = batch_size 
@@ -120,6 +123,9 @@ class Classification_Model_Runner:
         x = self.run_dpu(image_list)
         end_time = time.time()
         print(f"Time to process {len(image_list)} : {end_time - start_time}")
+        label_list = [rev_dic[y[0]] for y in x]
+        #print(label_list)
+        print(f"Results: {Counter(label_list)}")
 
         #print(rev_dic.keys())
 

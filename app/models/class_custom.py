@@ -7,10 +7,10 @@ import numpy as np
 
 class Class_Custom(Model):
     def __init__(self):
-        width, height = 224, 224
+        width, height = 128, 128
         num_classes = 10
         self.model = ImageClassifier(height, width, num_classes)
-        path = "app/models/class_v1/model_10.pth"
+        path = "app/models/model_resume_10.pth"
         state_dict = torch.load(path)
         self.model.load_state_dict(state_dict)
         super().__init__()
